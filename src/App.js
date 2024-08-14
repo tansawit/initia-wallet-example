@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import { useAddress, useWallet } from "@initia/react-wallet-widget"
+import { MsgSend } from "@initia/initia.js"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App = () => {
+  const address = useAddress()
+  const { onboard, view, requestTx } = useWallet()
+
+  if (address) {
+    const send = async () => {
+      const msgs = [
+        MsgSend.fromProto({
+          fromAddress: address,
+          toAddress: address,
+          amount: [{ amount: "1000000", denom: "uinit" }],
+        }),
+      ]
+      const transactionHash = await requestTx({ msgs, memo: "" })
+      console.log(transactionHash)
+    }
+
+    return (
+      <>
+        <button onClick={view}>{address}</button>
+        <button onClick={send}>Send</button>
+      </>
+    )
+  }
+
+  return <button onClick={onboard}>Connect</button>
 }
 
-export default App;
+export default App
